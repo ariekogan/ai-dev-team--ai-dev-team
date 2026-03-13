@@ -8,9 +8,7 @@
     "build": "node esbuild.config.mjs"
   },
   "dependencies": {
-    "better-sqlite3": "^12.6.2"
-  },
-  "devDependencies": {
+    "better-sqlite3": "^12.6.2",
     "esbuild": "^0.20.0"
   }
 }
