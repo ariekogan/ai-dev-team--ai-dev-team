@@ -1,0 +1,7 @@
+{
+  "name": "project-knowledge-mcp",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "server.js",
+  "description": "MCP connector for project knowledge base — architecture docs, standards, rules, and decisions"
+}

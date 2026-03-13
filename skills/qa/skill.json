@@ -1,0 +1,672 @@
+{
+  "description": "QA tester — runs browser-based e2e acceptance tests, updates task status with results",
+  "version": "1.0.0",
+  "phase": "DEPLOYED",
+  "problem": {
+    "statement": "Code needs e2e acceptance testing",
+    "context": "Dev frontend at http://dev-frontend",
+    "goals": [
+      "Screenshot UI",
+      "Check elements",
+      "Test workflows",
+      "Report PASS/FAIL"
+    ]
+  },
+  "scenarios": [
+    {
+      "id": "screenshot",
+      "title": "Take screenshot",
+      "description": "Test scenario for screenshot",
+      "steps": [
+        "User says: \"take screenshot\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for screenshot is handled successfully."
+    },
+    {
+      "id": "check",
+      "title": "Check elements",
+      "description": "Test scenario for check",
+      "steps": [
+        "User says: \"check elements\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for check is handled successfully."
+    },
+    {
+      "id": "interact",
+      "title": "Browser actions",
+      "description": "Test scenario for interact",
+      "steps": [
+        "User says: \"click button\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for interact is handled successfully."
+    },
+    {
+      "id": "pageinfo",
+      "title": "Get page info",
+      "description": "Test scenario for pageinfo",
+      "steps": [
+        "User says: \"get page info\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for pageinfo is handled successfully."
+    },
+    {
+      "id": "list",
+      "title": "List tasks (read-only)",
+      "description": "Test scenario for list",
+      "steps": [
+        "User says: \"list tasks\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for list is handled successfully."
+    },
+    {
+      "id": "get",
+      "title": "Get task (read-only)",
+      "description": "Test scenario for get",
+      "steps": [
+        "User says: \"get task\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for get is handled successfully."
+    }
+  ],
+  "role": {
+    "name": "QA",
+    "persona": "QA tester. Browser e2e tests against http://dev-frontend. Workflow: screenshot→check→interact→report PASS/FAIL with evidence.",
+    "goals": [
+      "Run e2e tests",
+      "Provide evidence",
+      "Report PASS/FAIL"
+    ],
+    "limitations": [
+      "Cannot write code",
+      "Tasks read-only"
+    ],
+    "communication_style": {
+      "tone": "casual",
+      "verbosity": "concise"
+    }
+  },
+  "glossary": {},
+  "intents": {
+    "supported": [
+      {
+        "id": "screenshot",
+        "description": "Take screenshot",
+        "examples": [
+          "take screenshot",
+          "screenshot the page"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "check",
+        "description": "Check elements",
+        "examples": [
+          "check elements",
+          "verify UI"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "interact",
+        "description": "Browser actions",
+        "examples": [
+          "click button",
+          "interact with page"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "pageinfo",
+        "description": "Get page info",
+        "examples": [
+          "get page info"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "list",
+        "description": "List tasks (read-only)",
+        "examples": [
+          "list tasks"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "get",
+        "description": "Get task (read-only)",
+        "examples": [
+          "get task"
+        ],
+        "maps_to_workflow_resolved": true
+      }
+    ],
+    "thresholds": {
+      "accept": 0.85,
+      "clarify": 0.6,
+      "reject": 0.4
+    },
+    "out_of_domain": {
+      "action": "redirect",
+      "message": "This request is outside my capabilities.",
+      "suggest_domains": []
+    }
+  },
+  "engine": {
+    "rv2": {
+      "max_iterations": 25,
+      "iteration_timeout_ms": 45000,
+      "allow_parallel_tools": false,
+      "on_max_iterations": "ask_user"
+    },
+    "hlr": {
+      "enabled": true,
+      "critic": {
+        "enabled": true,
+        "check_interval": 3,
+        "strictness": "medium"
+      },
+      "reflection": {
+        "enabled": true,
+        "depth": "shallow"
+      },
+      "replanning": {
+        "enabled": true,
+        "max_replans": 5
+      }
+    },
+    "autonomy": {
+      "level": "autonomous"
+    },
+    "finalization_gate": {
+      "enabled": true,
+      "max_retries": 2
+    },
+    "internal_error": {
+      "enabled": true,
+      "tool_not_found": {
+        "enter_resolution_after": 1,
+        "retryable": false
+      },
+      "resolution": {
+        "max_iterations": 1,
+        "allowed_capabilities": [
+          "read",
+          "search",
+          "document_output"
+        ]
+      },
+      "loop_detection": {
+        "enabled": true,
+        "identical_call_threshold": 2
+      }
+    },
+    "model": "claude-sonnet-4-20250514",
+    "temperature": 0.3
+  },
+  "toolbox_imports": [],
+  "tools": [
+    {
+      "id": "tool-browser-screenshot",
+      "id_status": "permanent",
+      "name": "browser.screenshot",
+      "description": "Take screenshot",
+      "inputs": [
+        {
+          "name": "url",
+          "type": "string",
+          "required": false,
+          "description": ""
+        },
+        {
+          "name": "path",
+          "type": "string",
+          "required": false,
+          "description": ""
+        },
+        {
+          "name": "fullPage",
+          "type": "boolean",
+          "required": false,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "dev-browser-mcp",
+        "mcp_tool": "browser.screenshot"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-browser-screenshot-auto",
+            "input": {},
+            "output": {
+              "success": true,
+              "data": {}
+            },
+            "description": "Auto-generated example for browser.screenshot"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-browser-check",
+      "id_status": "permanent",
+      "name": "browser.check",
+      "description": "Check elements",
+      "inputs": [
+        {
+          "name": "url",
+          "type": "string",
+          "required": false,
+          "description": ""
+        },
+        {
+          "name": "checks",
+          "type": "array",
+          "required": true,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "dev-browser-mcp",
+        "mcp_tool": "browser.check"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-browser-check-auto",
+            "input": {
+              "checks": "example"
+            },
+            "output": {
+              "success": true,
+              "data": {}
+            },
+            "description": "Auto-generated example for browser.check"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-browser-interact",
+      "id_status": "permanent",
+      "name": "browser.interact",
+      "description": "Browser actions",
+      "inputs": [
+        {
+          "name": "url",
+          "type": "string",
+          "required": false,
+          "description": ""
+        },
+        {
+          "name": "actions",
+          "type": "array",
+          "required": true,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "dev-browser-mcp",
+        "mcp_tool": "browser.interact"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-browser-interact-auto",
+            "input": {
+              "actions": "example"
+            },
+            "output": {
+              "success": true,
+              "data": {}
+            },
+            "description": "Auto-generated example for browser.interact"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-browser-pageinfo",
+      "id_status": "permanent",
+      "name": "browser.pageinfo",
+      "description": "Get page info",
+      "inputs": [
+        {
+          "name": "url",
+          "type": "string",
+          "required": false,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "dev-browser-mcp",
+        "mcp_tool": "browser.pageinfo"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-browser-pageinfo-auto",
+            "input": {},
+            "output": {
+              "success": true,
+              "data": {}
+            },
+            "description": "Auto-generated example for browser.pageinfo"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-tasks-list",
+      "id_status": "permanent",
+      "name": "tasks.list",
+      "description": "List tasks (read-only)",
+      "inputs": [
+        {
+          "name": "status",
+          "type": "string",
+          "required": false,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "task-board-mcp",
+        "mcp_tool": "tasks.list"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-tasks-list-auto",
+            "input": {},
+            "output": {
+              "results": [
+                {
+                  "id": 1,
+                  "name": "Example item"
+                }
+              ],
+              "total_count": 1
+            },
+            "description": "Auto-generated example for tasks.list"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-tasks-get",
+      "id_status": "permanent",
+      "name": "tasks.get",
+      "description": "Get task (read-only)",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "task-board-mcp",
+        "mcp_tool": "tasks.get"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-tasks-get-auto",
+            "input": {
+              "id": "id-001"
+            },
+            "output": {
+              "success": true,
+              "data": {}
+            },
+            "description": "Auto-generated example for tasks.get"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-tasks-update",
+      "id_status": "permanent",
+      "name": "tasks.update",
+      "description": "Update task status after testing",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": ""
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "required": false,
+          "description": ""
+        },
+        {
+          "name": "assignee",
+          "type": "string",
+          "required": false,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "task-board-mcp",
+        "mcp_tool": "tasks.update"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-tasks-update-auto",
+            "input": {
+              "id": "id-001"
+            },
+            "output": {
+              "id": 1,
+              "status": "updated",
+              "message": "Updated successfully."
+            },
+            "description": "Auto-generated example for tasks.update"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-tasks-add_comment",
+      "id_status": "permanent",
+      "name": "tasks.add_comment",
+      "description": "Add test results comment to task",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": ""
+        },
+        {
+          "name": "text",
+          "type": "string",
+          "required": true,
+          "description": ""
+        },
+        {
+          "name": "author",
+          "type": "string",
+          "required": false,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "task-board-mcp",
+        "mcp_tool": "tasks.add_comment"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-tasks-add_comment-auto",
+            "input": {
+              "id": "id-001",
+              "text": "example"
+            },
+            "output": {
+              "id": 1,
+              "status": "created",
+              "message": "Created successfully."
+            },
+            "description": "Auto-generated example for tasks.add_comment"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    }
+  ],
+  "meta_tools": [],
+  "triggers": [
+    {
+      "id": "poll-testing",
+      "type": "schedule",
+      "enabled": true,
+      "every": "PT5M",
+      "concurrency": 1,
+      "prompt": "Check the task board for tasks with status 'testing'. If there are tasks, pick the first one. Read the task details to understand what was changed, then run e2e acceptance tests: take screenshots, check elements, interact with the page. Report PASS or FAIL with evidence. If PASS, update the task status to 'done'. If FAIL, update status back to 'todo' and add a comment describing what failed."
+    }
+  ],
+  "connectors": [
+    "dev-browser-mcp",
+    "task-board-mcp"
+  ],
+  "policy": {
+    "guardrails": {
+      "never": [],
+      "always": []
+    },
+    "approvals": [],
+    "workflows": [],
+    "escalation": {
+      "enabled": false,
+      "conditions": [],
+      "target": ""
+    }
+  },
+  "channels": [],
+  "id": "qa",
+  "name": "QA",
+  "ui_capable": false,
+  "grant_mappings": [],
+  "access_policy": {
+    "rules": [
+      {
+        "tools": [
+          "*"
+        ],
+        "effect": "allow"
+      }
+    ]
+  },
+  "response_filters": [],
+  "created_at": "2026-03-01T23:42:57.620Z",
+  "updated_at": "2026-03-11T17:43:17.220Z",
+  "redeploy_only": true
+}

@@ -1,0 +1,482 @@
+{
+  "description": "Developer — writes code, fixes bugs",
+  "version": "1.1.0",
+  "phase": "DEPLOYED",
+  "problem": {
+    "statement": "Need AI to directly read/modify code",
+    "context": "File access, shell, workspace tools",
+    "goals": [
+      "Read and modify code",
+      "Use runShell",
+      "Reference tasks/docs"
+    ]
+  },
+  "scenarios": [
+    {
+      "id": "list",
+      "title": "List tasks (read-only)",
+      "description": "Test scenario for list",
+      "steps": [
+        "User says: \"list tasks\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for list is handled successfully."
+    },
+    {
+      "id": "get",
+      "title": "Get task (read-only)",
+      "description": "Test scenario for get",
+      "steps": [
+        "User says: \"get task\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for get is handled successfully."
+    },
+    {
+      "id": "list_docs",
+      "title": "List docs (read-only)",
+      "description": "Test scenario for list docs",
+      "steps": [
+        "User says: \"list docs\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for list docs is handled successfully."
+    },
+    {
+      "id": "get_doc",
+      "title": "Get doc (read-only)",
+      "description": "Test scenario for get doc",
+      "steps": [
+        "User says: \"get doc\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for get doc is handled successfully."
+    },
+    {
+      "id": "search",
+      "title": "Search docs (read-only)",
+      "description": "Test scenario for search",
+      "steps": [
+        "User says: \"search docs\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for search is handled successfully."
+    }
+  ],
+  "role": {
+    "name": "Dev",
+    "persona": "Expert full-stack dev. Direct codebase access. READ→SEARCH→PLAN→EDIT→VERIFY. Workspace at /workspace/. Read-only tasks and knowledge.",
+    "goals": [
+      "Modify code directly",
+      "Use runShell for git/npm",
+      "Reference tasks and docs"
+    ],
+    "limitations": [
+      "Tasks read-only",
+      "Docs read-only",
+      "No browser tests"
+    ],
+    "communication_style": {
+      "tone": "casual",
+      "verbosity": "concise"
+    }
+  },
+  "glossary": {},
+  "intents": {
+    "supported": [
+      {
+        "id": "list",
+        "description": "List tasks (read-only)",
+        "examples": [
+          "list tasks",
+          "show tasks"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "get",
+        "description": "Get task (read-only)",
+        "examples": [
+          "get task",
+          "show task"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "list_docs",
+        "description": "List docs (read-only)",
+        "examples": [
+          "list docs"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "get_doc",
+        "description": "Get doc (read-only)",
+        "examples": [
+          "get doc"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "search",
+        "description": "Search docs (read-only)",
+        "examples": [
+          "search docs"
+        ],
+        "maps_to_workflow_resolved": true
+      }
+    ],
+    "thresholds": {
+      "accept": 0.85,
+      "clarify": 0.6,
+      "reject": 0.4
+    },
+    "out_of_domain": {
+      "action": "redirect",
+      "message": "This request is outside my capabilities.",
+      "suggest_domains": []
+    }
+  },
+  "engine": {
+    "rv2": {
+      "max_iterations": 40,
+      "iteration_timeout_ms": 60000,
+      "allow_parallel_tools": false,
+      "on_max_iterations": "ask_user"
+    },
+    "hlr": {
+      "enabled": true,
+      "critic": {
+        "enabled": true,
+        "check_interval": 3,
+        "strictness": "medium"
+      },
+      "reflection": {
+        "enabled": true,
+        "depth": "shallow"
+      },
+      "replanning": {
+        "enabled": true,
+        "max_replans": 5
+      }
+    },
+    "autonomy": {
+      "level": "autonomous"
+    },
+    "finalization_gate": {
+      "enabled": true,
+      "max_retries": 2
+    },
+    "internal_error": {
+      "enabled": true,
+      "tool_not_found": {
+        "enter_resolution_after": 1,
+        "retryable": false
+      },
+      "resolution": {
+        "max_iterations": 1,
+        "allowed_capabilities": [
+          "read",
+          "search",
+          "document_output"
+        ]
+      },
+      "loop_detection": {
+        "enabled": true,
+        "identical_call_threshold": 2
+      }
+    },
+    "model": "claude-sonnet-4-20250514",
+    "temperature": 0.3
+  },
+  "toolbox_imports": [],
+  "tools": [
+    {
+      "id": "tool-tasks-list",
+      "id_status": "permanent",
+      "name": "tasks.list",
+      "description": "List tasks (read-only)",
+      "inputs": [
+        {
+          "name": "status",
+          "type": "string",
+          "required": false,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "task-board-mcp",
+        "mcp_tool": "tasks.list"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-tasks-list-auto",
+            "input": {},
+            "output": {
+              "results": [
+                {
+                  "id": 1,
+                  "name": "Example item"
+                }
+              ],
+              "total_count": 1
+            },
+            "description": "Auto-generated example for tasks.list"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-tasks-get",
+      "id_status": "permanent",
+      "name": "tasks.get",
+      "description": "Get task (read-only)",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "task-board-mcp",
+        "mcp_tool": "tasks.get"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-tasks-get-auto",
+            "input": {
+              "id": "id-001"
+            },
+            "output": {
+              "success": true,
+              "data": {}
+            },
+            "description": "Auto-generated example for tasks.get"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-knowledge-list_docs",
+      "id_status": "permanent",
+      "name": "knowledge.list_docs",
+      "description": "List docs (read-only)",
+      "inputs": [
+        {
+          "name": "category",
+          "type": "string",
+          "required": false,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "project-knowledge-mcp",
+        "mcp_tool": "knowledge.list_docs"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-knowledge-list_docs-auto",
+            "input": {},
+            "output": {
+              "results": [
+                {
+                  "id": 1,
+                  "name": "Example item"
+                }
+              ],
+              "total_count": 1
+            },
+            "description": "Auto-generated example for knowledge.list_docs"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-knowledge-get_doc",
+      "id_status": "permanent",
+      "name": "knowledge.get_doc",
+      "description": "Get doc (read-only)",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "project-knowledge-mcp",
+        "mcp_tool": "knowledge.get_doc"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-knowledge-get_doc-auto",
+            "input": {
+              "id": "id-001"
+            },
+            "output": {
+              "success": true,
+              "data": {}
+            },
+            "description": "Auto-generated example for knowledge.get_doc"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-knowledge-search",
+      "id_status": "permanent",
+      "name": "knowledge.search",
+      "description": "Search docs (read-only)",
+      "inputs": [
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "project-knowledge-mcp",
+        "mcp_tool": "knowledge.search"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-knowledge-search-auto",
+            "input": {
+              "query": "search term"
+            },
+            "output": {
+              "results": [
+                {
+                  "id": 1,
+                  "name": "Example item"
+                }
+              ],
+              "total_count": 1
+            },
+            "description": "Auto-generated example for knowledge.search"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    }
+  ],
+  "meta_tools": [],
+  "triggers": [
+    {
+      "id": "poll-tasks",
+      "type": "schedule",
+      "enabled": true,
+      "every": "PT5M",
+      "concurrency": 1,
+      "prompt": "Check the task board for tasks assigned to 'dev' with status 'todo'. If there are tasks, pick the highest priority one. Read the task details, then implement it: read the relevant files, make the code changes, verify your work. When done, update the task status to 'testing' so QA can pick it up."
+    }
+  ],
+  "connectors": [
+    "task-board-mcp",
+    "project-knowledge-mcp"
+  ],
+  "policy": {
+    "guardrails": {
+      "never": [],
+      "always": []
+    },
+    "approvals": [],
+    "workflows": [],
+    "escalation": {
+      "enabled": false,
+      "conditions": [],
+      "target": ""
+    }
+  },
+  "channels": [],
+  "id": "dev",
+  "name": "Dev",
+  "ui_capable": false,
+  "grant_mappings": [],
+  "access_policy": {
+    "rules": [
+      {
+        "tools": [
+          "*"
+        ],
+        "effect": "allow"
+      }
+    ]
+  },
+  "response_filters": [],
+  "created_at": "2026-03-01T14:01:19.987Z",
+  "updated_at": "2026-03-11T17:43:09.503Z",
+  "persona": {
+    "style": "Direct and efficient. Always reads code before editing. Shows what changed after edits. Uses code tools directly — never suggests creating task cards for code changes."
+  },
+  "cascading_issues": []
+}

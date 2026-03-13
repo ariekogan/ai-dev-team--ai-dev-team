@@ -1,0 +1,426 @@
+{
+  "description": "Knowledge manager — project docs",
+  "version": "1.0.0",
+  "phase": "DEPLOYED",
+  "problem": {
+    "statement": "Docs need to be created, organized, searchable",
+    "context": "Knowledge base with categories and search",
+    "goals": [
+      "Create/update docs",
+      "Organize by category",
+      "Search"
+    ]
+  },
+  "scenarios": [
+    {
+      "id": "list_docs",
+      "title": "List docs",
+      "description": "Test scenario for list docs",
+      "steps": [
+        "User says: \"list docs\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for list docs is handled successfully."
+    },
+    {
+      "id": "get_doc",
+      "title": "Get doc by ID",
+      "description": "Test scenario for get doc",
+      "steps": [
+        "User says: \"get doc\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for get doc is handled successfully."
+    },
+    {
+      "id": "update_doc",
+      "title": "Create or update doc",
+      "description": "Test scenario for update doc",
+      "steps": [
+        "User says: \"create doc\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for update doc is handled successfully."
+    },
+    {
+      "id": "search",
+      "title": "Search docs",
+      "description": "Test scenario for search",
+      "steps": [
+        "User says: \"search docs\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for search is handled successfully."
+    }
+  ],
+  "role": {
+    "name": "Knowledge",
+    "persona": "Knowledge manager. Maintain project docs. Create, update, list, search documents.",
+    "goals": [
+      "Maintain docs",
+      "Organize by category",
+      "Help users find info"
+    ],
+    "limitations": [
+      "Cannot write code",
+      "Cannot manage tasks",
+      "Cannot run tests"
+    ],
+    "communication_style": {
+      "tone": "casual",
+      "verbosity": "concise"
+    }
+  },
+  "glossary": {},
+  "intents": {
+    "supported": [
+      {
+        "id": "list_docs",
+        "description": "List docs",
+        "examples": [
+          "list docs",
+          "show documents"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "get_doc",
+        "description": "Get doc by ID",
+        "examples": [
+          "get doc",
+          "show document"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "update_doc",
+        "description": "Create or update doc",
+        "examples": [
+          "create doc",
+          "update document"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "search",
+        "description": "Search docs",
+        "examples": [
+          "search docs",
+          "find documentation"
+        ],
+        "maps_to_workflow_resolved": true
+      }
+    ],
+    "thresholds": {
+      "accept": 0.85,
+      "clarify": 0.6,
+      "reject": 0.4
+    },
+    "out_of_domain": {
+      "action": "redirect",
+      "message": "This request is outside my capabilities.",
+      "suggest_domains": []
+    }
+  },
+  "engine": {
+    "rv2": {
+      "max_iterations": 10,
+      "iteration_timeout_ms": 30000,
+      "allow_parallel_tools": false,
+      "on_max_iterations": "ask_user"
+    },
+    "hlr": {
+      "enabled": true,
+      "critic": {
+        "enabled": true,
+        "check_interval": 3,
+        "strictness": "medium"
+      },
+      "reflection": {
+        "enabled": true,
+        "depth": "shallow"
+      },
+      "replanning": {
+        "enabled": true,
+        "max_replans": 5
+      }
+    },
+    "autonomy": {
+      "level": "autonomous"
+    },
+    "finalization_gate": {
+      "enabled": true,
+      "max_retries": 2
+    },
+    "internal_error": {
+      "enabled": true,
+      "tool_not_found": {
+        "enter_resolution_after": 1,
+        "retryable": false
+      },
+      "resolution": {
+        "max_iterations": 1,
+        "allowed_capabilities": [
+          "read",
+          "search",
+          "document_output"
+        ]
+      },
+      "loop_detection": {
+        "enabled": true,
+        "identical_call_threshold": 2
+      }
+    },
+    "model": "claude-sonnet-4-20250514",
+    "temperature": 0.3
+  },
+  "toolbox_imports": [],
+  "tools": [
+    {
+      "id": "tool-knowledge-list_docs",
+      "id_status": "permanent",
+      "name": "knowledge.list_docs",
+      "description": "List docs",
+      "inputs": [
+        {
+          "name": "category",
+          "type": "string",
+          "required": false,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "project-knowledge-mcp",
+        "mcp_tool": "knowledge.list_docs"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-knowledge-list_docs-auto",
+            "input": {},
+            "output": {
+              "results": [
+                {
+                  "id": 1,
+                  "name": "Example item"
+                }
+              ],
+              "total_count": 1
+            },
+            "description": "Auto-generated example for knowledge.list_docs"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-knowledge-get_doc",
+      "id_status": "permanent",
+      "name": "knowledge.get_doc",
+      "description": "Get doc by ID",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "project-knowledge-mcp",
+        "mcp_tool": "knowledge.get_doc"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-knowledge-get_doc-auto",
+            "input": {
+              "id": "id-001"
+            },
+            "output": {
+              "success": true,
+              "data": {}
+            },
+            "description": "Auto-generated example for knowledge.get_doc"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-knowledge-update_doc",
+      "id_status": "permanent",
+      "name": "knowledge.update_doc",
+      "description": "Create or update doc",
+      "inputs": [
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "description": ""
+        },
+        {
+          "name": "category",
+          "type": "string",
+          "required": true,
+          "description": ""
+        },
+        {
+          "name": "content",
+          "type": "string",
+          "required": true,
+          "description": ""
+        },
+        {
+          "name": "tags",
+          "type": "array",
+          "required": false,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "project-knowledge-mcp",
+        "mcp_tool": "knowledge.update_doc"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-knowledge-update_doc-auto",
+            "input": {
+              "title": "example",
+              "category": "standard",
+              "content": "example"
+            },
+            "output": {
+              "id": 1,
+              "status": "created",
+              "message": "Created successfully."
+            },
+            "description": "Auto-generated example for knowledge.update_doc"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-knowledge-search",
+      "id_status": "permanent",
+      "name": "knowledge.search",
+      "description": "Search docs",
+      "inputs": [
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "project-knowledge-mcp",
+        "mcp_tool": "knowledge.search"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-knowledge-search-auto",
+            "input": {
+              "query": "search term"
+            },
+            "output": {
+              "results": [
+                {
+                  "id": 1,
+                  "name": "Example item"
+                }
+              ],
+              "total_count": 1
+            },
+            "description": "Auto-generated example for knowledge.search"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    }
+  ],
+  "meta_tools": [],
+  "triggers": [],
+  "connectors": [
+    "project-knowledge-mcp"
+  ],
+  "policy": {
+    "guardrails": {
+      "never": [],
+      "always": []
+    },
+    "approvals": [],
+    "workflows": [],
+    "escalation": {
+      "enabled": false,
+      "conditions": [],
+      "target": ""
+    }
+  },
+  "channels": [],
+  "id": "knowledge",
+  "name": "Knowledge",
+  "ui_capable": false,
+  "grant_mappings": [],
+  "access_policy": {
+    "rules": [
+      {
+        "tools": [
+          "*"
+        ],
+        "effect": "allow"
+      }
+    ]
+  },
+  "response_filters": [],
+  "created_at": "2026-03-01T23:42:57.678Z",
+  "updated_at": "2026-03-11T17:43:23.923Z",
+  "redeploy_only": true
+}

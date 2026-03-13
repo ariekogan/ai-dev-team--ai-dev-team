@@ -1,0 +1,141 @@
+{
+  "id": "ai-dev-team",
+  "name": "AI Dev Team",
+  "version": "1.0.0",
+  "description": "AI dev team: PM coordinates, Dev codes, QA tests, Knowledge documents",
+  "identity": {
+    "actor_types": [
+      {
+        "key": "developer",
+        "label": "Developer",
+        "description": "Software developer using the AI dev team"
+      },
+      {
+        "key": "lead",
+        "label": "Tech Lead",
+        "description": "Technical lead overseeing development"
+      }
+    ],
+    "admin_roles": [
+      "lead"
+    ],
+    "default_actor_type": "developer",
+    "default_roles": []
+  },
+  "skills": [
+    {
+      "id": "pm",
+      "name": "PM",
+      "role": "orchestrator",
+      "description": "Project manager — manages tasks, coordinates Dev and QA",
+      "entry_channels": [
+        "chat"
+      ],
+      "connectors": [
+        "task-board-mcp",
+        "project-knowledge-mcp",
+        "devteam-dashboard-mcp",
+        "telegram-mcp"
+      ]
+    },
+    {
+      "id": "dev",
+      "name": "Dev",
+      "role": "worker",
+      "description": "Developer — reads, writes, and fixes code",
+      "entry_channels": [
+        "chat"
+      ],
+      "connectors": [
+        "task-board-mcp",
+        "project-knowledge-mcp"
+      ]
+    },
+    {
+      "id": "qa",
+      "name": "QA",
+      "role": "worker",
+      "description": "QA tester — browser-based e2e acceptance tests",
+      "entry_channels": [
+        "chat"
+      ],
+      "connectors": [
+        "dev-browser-mcp",
+        "task-board-mcp"
+      ]
+    },
+    {
+      "id": "knowledge",
+      "name": "Knowledge",
+      "role": "worker",
+      "description": "Knowledge manager — project documentation",
+      "entry_channels": [
+        "chat"
+      ],
+      "connectors": [
+        "project-knowledge-mcp"
+      ]
+    }
+  ],
+  "grants": [],
+  "handoffs": [
+    {
+      "id": "pm-to-dev",
+      "from": "pm",
+      "to": "dev",
+      "trigger": "When a task needs code implementation",
+      "grants_passed": [],
+      "mechanism": "internal-message"
+    },
+    {
+      "id": "pm-to-qa",
+      "from": "pm",
+      "to": "qa",
+      "trigger": "When code changes need e2e testing",
+      "grants_passed": [],
+      "mechanism": "internal-message"
+    },
+    {
+      "id": "pm-to-knowledge",
+      "from": "pm",
+      "to": "knowledge",
+      "trigger": "When documentation needs updating",
+      "grants_passed": [],
+      "mechanism": "internal-message"
+    }
+  ],
+  "routing": {
+    "chat": {
+      "default_skill": "pm",
+      "description": "PM is the hub"
+    }
+  },
+  "platform_connectors": [
+    {
+      "id": "task-board-mcp",
+      "description": "Task board connector",
+      "required": true
+    },
+    {
+      "id": "project-knowledge-mcp",
+      "description": "Knowledge base connector",
+      "required": true
+    },
+    {
+      "id": "dev-browser-mcp",
+      "description": "Browser testing connector",
+      "required": false
+    },
+    {
+      "id": "devteam-dashboard-mcp",
+      "description": "Dashboard UI connector",
+      "required": false
+    },
+    {
+      "id": "telegram-mcp",
+      "description": "Telegram messaging connector",
+      "required": false
+    }
+  ],
+  "security_contracts": []
+}

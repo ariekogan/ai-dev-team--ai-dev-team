@@ -1,0 +1,908 @@
+{
+  "description": "Project manager — manages tasks, coordinates Dev and QA",
+  "version": "1.0.0",
+  "phase": "DEPLOYED",
+  "problem": {
+    "statement": "Teams need a PM to track tasks and coordinate",
+    "context": "Kanban task board + knowledge base",
+    "goals": [
+      "Manage tasks",
+      "Coordinate Dev and QA",
+      "Track progress"
+    ]
+  },
+  "scenarios": [
+    {
+      "id": "create",
+      "title": "Create a task",
+      "description": "Test scenario for create",
+      "steps": [
+        "User says: \"create a task\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for create is handled successfully."
+    },
+    {
+      "id": "list",
+      "title": "List tasks",
+      "description": "Test scenario for list",
+      "steps": [
+        "User says: \"show tasks\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for list is handled successfully."
+    },
+    {
+      "id": "get",
+      "title": "Get task by ID",
+      "description": "Test scenario for get",
+      "steps": [
+        "User says: \"get task\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for get is handled successfully."
+    },
+    {
+      "id": "update",
+      "title": "Update task fields",
+      "description": "Test scenario for update",
+      "steps": [
+        "User says: \"update task\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for update is handled successfully."
+    },
+    {
+      "id": "complete",
+      "title": "Mark task done",
+      "description": "Test scenario for complete",
+      "steps": [
+        "User says: \"complete task\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for complete is handled successfully."
+    },
+    {
+      "id": "add_comment",
+      "title": "Comment on task",
+      "description": "Test scenario for add comment",
+      "steps": [
+        "User says: \"add comment\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for add comment is handled successfully."
+    },
+    {
+      "id": "list_docs",
+      "title": "List docs",
+      "description": "Test scenario for list docs",
+      "steps": [
+        "User says: \"list docs\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for list docs is handled successfully."
+    },
+    {
+      "id": "get_doc",
+      "title": "Get doc by ID",
+      "description": "Test scenario for get doc",
+      "steps": [
+        "User says: \"get doc\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for get doc is handled successfully."
+    },
+    {
+      "id": "search",
+      "title": "Search docs",
+      "description": "Test scenario for search",
+      "steps": [
+        "User says: \"search docs\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for search is handled successfully."
+    },
+    {
+      "id": "send_notification",
+      "title": "Send a Telegram notification",
+      "description": "Test scenario for send notification",
+      "steps": [
+        "User says: \"notify the team\"",
+        "Agent presents results to the user"
+      ],
+      "expected_outcome": "User request for send notification is handled successfully."
+    }
+  ],
+  "role": {
+    "name": "PM",
+    "persona": "You are the project manager for the AI Dev Team. You manage the Kanban task board, coordinate Dev and QA, and track progress. You ALWAYS use your task board tools (tasks.list, tasks.get, tasks.create, etc.) to interact with the board — never ask users to share links or exports. The board is YOUR primary tool. Read access to knowledge base. When tasks need coding, hand off to Dev. When code needs testing, hand off to QA.",
+    "goals": [
+      "Manage tasks",
+      "Track progress",
+      "Coordinate team"
+    ],
+    "limitations": [
+      "Cannot write code",
+      "Cannot run browser tests"
+    ],
+    "communication_style": {
+      "tone": "casual",
+      "verbosity": "concise"
+    }
+  },
+  "glossary": {},
+  "intents": {
+    "supported": [
+      {
+        "id": "create",
+        "description": "Create a task",
+        "examples": [
+          "create a task",
+          "add new task",
+          "I need a new task for"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "list",
+        "description": "List tasks",
+        "examples": [
+          "show tasks",
+          "list all tasks",
+          "what tasks do we have",
+          "show me the board",
+          "what's on the board"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "get",
+        "description": "Get task by ID",
+        "examples": [
+          "get task",
+          "show task details",
+          "tell me about task"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "update",
+        "description": "Update task fields",
+        "examples": [
+          "update task",
+          "change task status",
+          "reassign task"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "complete",
+        "description": "Mark task done",
+        "examples": [
+          "complete task",
+          "mark as done",
+          "finish task"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "add_comment",
+        "description": "Comment on task",
+        "examples": [
+          "add comment",
+          "comment on task",
+          "leave a note"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "list_docs",
+        "description": "List docs",
+        "examples": [
+          "list docs",
+          "show documents"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "get_doc",
+        "description": "Get doc by ID",
+        "examples": [
+          "get doc",
+          "show document"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "search",
+        "description": "Search docs",
+        "examples": [
+          "search docs",
+          "find documentation"
+        ],
+        "maps_to_workflow_resolved": true
+      },
+      {
+        "id": "send_notification",
+        "description": "Send a Telegram notification",
+        "examples": [
+          "notify the team",
+          "send a message on telegram",
+          "alert via telegram"
+        ],
+        "maps_to_workflow_resolved": true
+      }
+    ],
+    "thresholds": {
+      "accept": 0.85,
+      "clarify": 0.6,
+      "reject": 0.4
+    },
+    "out_of_domain": {
+      "action": "redirect",
+      "message": "This request is outside my capabilities.",
+      "suggest_domains": []
+    }
+  },
+  "engine": {
+    "rv2": {
+      "max_iterations": 10,
+      "iteration_timeout_ms": 30000,
+      "allow_parallel_tools": false,
+      "on_max_iterations": "ask_user"
+    },
+    "hlr": {
+      "enabled": true,
+      "critic": {
+        "enabled": true,
+        "check_interval": 3,
+        "strictness": "medium"
+      },
+      "reflection": {
+        "enabled": true,
+        "depth": "shallow"
+      },
+      "replanning": {
+        "enabled": true,
+        "max_replans": 5
+      }
+    },
+    "autonomy": {
+      "level": "autonomous"
+    },
+    "finalization_gate": {
+      "enabled": true,
+      "max_retries": 2
+    },
+    "internal_error": {
+      "enabled": true,
+      "tool_not_found": {
+        "enter_resolution_after": 1,
+        "retryable": false
+      },
+      "resolution": {
+        "max_iterations": 1,
+        "allowed_capabilities": [
+          "read",
+          "search",
+          "document_output"
+        ]
+      },
+      "loop_detection": {
+        "enabled": true,
+        "identical_call_threshold": 2
+      }
+    },
+    "model": "claude-sonnet-4-20250514",
+    "temperature": 0.3
+  },
+  "toolbox_imports": [],
+  "tools": [
+    {
+      "id": "tool-tasks-create",
+      "id_status": "permanent",
+      "name": "tasks.create",
+      "description": "Create a task on the Kanban board",
+      "inputs": [
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "description": ""
+        },
+        {
+          "name": "description",
+          "type": "string",
+          "required": false,
+          "description": ""
+        },
+        {
+          "name": "priority",
+          "type": "string",
+          "required": false,
+          "description": ""
+        },
+        {
+          "name": "assignee",
+          "type": "string",
+          "required": false,
+          "description": ""
+        },
+        {
+          "name": "tags",
+          "type": "array",
+          "required": false,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "task-board-mcp",
+        "mcp_tool": "tasks.create"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-tasks-create-auto",
+            "input": {
+              "title": "example"
+            },
+            "output": {
+              "id": 1,
+              "status": "created",
+              "message": "Created successfully."
+            },
+            "description": "Auto-generated example for tasks.create"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-tasks-list",
+      "id_status": "permanent",
+      "name": "tasks.list",
+      "description": "List tasks from the Kanban board",
+      "inputs": [
+        {
+          "name": "status",
+          "type": "string",
+          "required": false,
+          "description": ""
+        },
+        {
+          "name": "assignee",
+          "type": "string",
+          "required": false,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "task-board-mcp",
+        "mcp_tool": "tasks.list"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-tasks-list-auto",
+            "input": {},
+            "output": {
+              "results": [
+                {
+                  "id": 1,
+                  "name": "Example item"
+                }
+              ],
+              "total_count": 1
+            },
+            "description": "Auto-generated example for tasks.list"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-tasks-get",
+      "id_status": "permanent",
+      "name": "tasks.get",
+      "description": "Get task details by ID",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "task-board-mcp",
+        "mcp_tool": "tasks.get"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-tasks-get-auto",
+            "input": {
+              "id": "id-001"
+            },
+            "output": {
+              "success": true,
+              "data": {}
+            },
+            "description": "Auto-generated example for tasks.get"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-tasks-update",
+      "id_status": "permanent",
+      "name": "tasks.update",
+      "description": "Update task fields",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": ""
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": false,
+          "description": ""
+        },
+        {
+          "name": "status",
+          "type": "string",
+          "required": false,
+          "description": ""
+        },
+        {
+          "name": "assignee",
+          "type": "string",
+          "required": false,
+          "description": ""
+        },
+        {
+          "name": "priority",
+          "type": "string",
+          "required": false,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "task-board-mcp",
+        "mcp_tool": "tasks.update"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-tasks-update-auto",
+            "input": {
+              "id": "id-001"
+            },
+            "output": {
+              "id": 1,
+              "status": "updated",
+              "message": "Updated successfully."
+            },
+            "description": "Auto-generated example for tasks.update"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-tasks-complete",
+      "id_status": "permanent",
+      "name": "tasks.complete",
+      "description": "Mark task done",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": ""
+        },
+        {
+          "name": "summary",
+          "type": "string",
+          "required": false,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "task-board-mcp",
+        "mcp_tool": "tasks.complete"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-tasks-complete-auto",
+            "input": {
+              "id": "id-001"
+            },
+            "output": {
+              "success": true,
+              "data": {}
+            },
+            "description": "Auto-generated example for tasks.complete"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-tasks-add_comment",
+      "id_status": "permanent",
+      "name": "tasks.add_comment",
+      "description": "Comment on task",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": ""
+        },
+        {
+          "name": "text",
+          "type": "string",
+          "required": true,
+          "description": ""
+        },
+        {
+          "name": "author",
+          "type": "string",
+          "required": false,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "task-board-mcp",
+        "mcp_tool": "tasks.add_comment"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-tasks-add_comment-auto",
+            "input": {
+              "id": "id-001",
+              "text": "example"
+            },
+            "output": {
+              "success": true,
+              "data": {}
+            },
+            "description": "Auto-generated example for tasks.add_comment"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-knowledge-list_docs",
+      "id_status": "permanent",
+      "name": "knowledge.list_docs",
+      "description": "List docs",
+      "inputs": [
+        {
+          "name": "category",
+          "type": "string",
+          "required": false,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "project-knowledge-mcp",
+        "mcp_tool": "knowledge.list_docs"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-knowledge-list_docs-auto",
+            "input": {},
+            "output": {
+              "results": [
+                {
+                  "id": 1,
+                  "name": "Example item"
+                }
+              ],
+              "total_count": 1
+            },
+            "description": "Auto-generated example for knowledge.list_docs"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-knowledge-get_doc",
+      "id_status": "permanent",
+      "name": "knowledge.get_doc",
+      "description": "Get doc by ID",
+      "inputs": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": true,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "project-knowledge-mcp",
+        "mcp_tool": "knowledge.get_doc"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-knowledge-get_doc-auto",
+            "input": {
+              "id": "id-001"
+            },
+            "output": {
+              "success": true,
+              "data": {}
+            },
+            "description": "Auto-generated example for knowledge.get_doc"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-knowledge-search",
+      "id_status": "permanent",
+      "name": "knowledge.search",
+      "description": "Search docs",
+      "inputs": [
+        {
+          "name": "query",
+          "type": "string",
+          "required": true,
+          "description": ""
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "project-knowledge-mcp",
+        "mcp_tool": "knowledge.search"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-knowledge-search-auto",
+            "input": {
+              "query": "search term"
+            },
+            "output": {
+              "results": [
+                {
+                  "id": 1,
+                  "name": "Example item"
+                }
+              ],
+              "total_count": 1
+            },
+            "description": "Auto-generated example for knowledge.search"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    },
+    {
+      "id": "tool-telegram-send_message",
+      "id_status": "permanent",
+      "name": "telegram.send_message",
+      "description": "Send a Telegram notification message",
+      "inputs": [
+        {
+          "name": "chat_id",
+          "type": "string",
+          "required": true,
+          "description": "Telegram chat ID to send to"
+        },
+        {
+          "name": "text",
+          "type": "string",
+          "required": true,
+          "description": "Message text (supports Markdown)"
+        },
+        {
+          "name": "parse_mode",
+          "type": "string",
+          "required": false,
+          "description": "Message format: Markdown or HTML"
+        }
+      ],
+      "output": {
+        "type": "object"
+      },
+      "source": {
+        "type": "mcp_bridge",
+        "connection_id": "telegram-mcp",
+        "mcp_tool": "telegram.send_message"
+      },
+      "policy": {
+        "allowed": "always"
+      },
+      "mock": {
+        "enabled": true,
+        "mode": "examples",
+        "examples": [
+          {
+            "id": "tool-telegram-send_message-auto",
+            "input": {
+              "chat_id": "id-001",
+              "text": "example"
+            },
+            "output": {
+              "success": true,
+              "data": {}
+            },
+            "description": "Auto-generated example for telegram.send_message"
+          }
+        ]
+      },
+      "security": {
+        "classification": "public"
+      }
+    }
+  ],
+  "meta_tools": [],
+  "triggers": [
+    {
+      "id": "check-stale-tasks",
+      "type": "schedule",
+      "enabled": true,
+      "every": "PT15M",
+      "concurrency": 1,
+      "prompt": "Check the task board for tasks that have been in 'in-progress' status. For each task, check if there are recent comments or updates. If a task has had no activity, send a Telegram notification to chat_id '668421539' with a summary of stale tasks. Use parse_mode 'Markdown'. Add a comment to each notified task with author 'pm' saying 'NOTIFIED: stale task alert sent'. Only notify tasks that do NOT already have a 'NOTIFIED: stale' comment from author 'pm'."
+    },
+    {
+      "id": "poll-review",
+      "type": "schedule",
+      "enabled": true,
+      "every": "PT5M",
+      "concurrency": 1,
+      "prompt": "Poll the task board: list tasks with status=review.\nThese are escalations from Dev or QA needing your input. For each:\n1. Read the task and its comments to understand the question\n2. Add a comment with your answer (author='pm', text='Clarification: <answer>')\n3. Set the task back to the appropriate status and assignee:\n   - If it was dev asking: status=todo + assignee=dev\n   - If it was qa asking: status=testing + assignee=qa\n   - Use the comment history to determine who escalated"
+    }
+  ],
+  "connectors": [
+    "task-board-mcp",
+    "project-knowledge-mcp",
+    "devteam-dashboard-mcp",
+    "telegram-mcp"
+  ],
+  "policy": {
+    "guardrails": {
+      "never": [],
+      "always": []
+    },
+    "approvals": [],
+    "workflows": [],
+    "escalation": {
+      "enabled": false,
+      "conditions": [],
+      "target": ""
+    }
+  },
+  "channels": [],
+  "id": "pm",
+  "name": "PM",
+  "ui_capable": false,
+  "grant_mappings": [],
+  "access_policy": {
+    "rules": [
+      {
+        "tools": [
+          "*"
+        ],
+        "effect": "allow"
+      }
+    ]
+  },
+  "response_filters": [],
+  "created_at": "2026-03-01T23:42:57.544Z",
+  "updated_at": "2026-03-11T17:43:02.772Z",
+  "redeploy_only": true
+}

@@ -1,0 +1,16 @@
+{
+  "name": "task-board-mcp",
+  "version": "2.0.0",
+  "type": "module",
+  "main": "server.js",
+  "description": "MCP connector for task board — create, track, and manage development tasks (SQLite-backed)",
+  "scripts": {
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.6.2"
+  },
+  "devDependencies": {
+    "vitest": "^3.2.4"
+  }
+}

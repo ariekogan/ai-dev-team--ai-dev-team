@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Dev Team Dashboard</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232733;
+    --border: #2d3142;
+    --text: #e4e6eb;
+    --text-dim: #8b8fa3;
+    --accent: #6366f1;
+    --todo: #6b7280;
+    --in-progress: #3b82f6;
+    --review: #f59e0b;
+    --testing: #a855f7;
+    --done: #22c55e;
+    --critical: #ef4444;
+    --high: #f97316;
+    --medium: #eab308;
+    --low: #6b7280;
+    --warn: #f59e0b;
+    --error: #ef4444;
+    --info: #3b82f6;
+    --success: #22c55e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .header h1 {
+    font-size: 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .header .stats {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .stat-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    background: var(--surface2);
+    border-radius: 12px;
+  }
+
+  .stat-badge .count {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0;
+    padding: 0 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab {
+    padding: 10px 20px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .content { padding: 20px 24px; }
+
+  /* ── Kanban Board ─────────────────────────── */
+  .kanban {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    min-height: 400px;
+  }
+
+  .kanban-col {
+    background: var(--surface);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .kanban-col-header {
+    padding: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .kanban-col-header .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 8px;
+    display: inline-block;
+  }
+
+  .col-todo .dot { background: var(--todo); }
+  .col-in_progress .dot { background: var(--in-progress); }
+  .col-review .dot { background: var(--review); }
+  .col-testing .dot { background: var(--testing); }
+  .col-done .dot { background: var(--done); }
+
+  .kanban-col-header .col-count {
+    background: var(--surface2);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .kanban-cards {
+    padding: 8px;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .task-card {
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+
+  .task-card:hover { border-color: var(--accent); }
+
+  .task-card .task-title {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    line-height: 1.3;
+  }
+
+  .task-card .task-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+
+  .priority-badge {
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .priority-critical { background: var(--critical); color: white; }
+  .priority-high { background: var(--high); color: white; }
+  .priority-medium { background: rgba(234, 179, 8, 0.2); color: var(--medium); }
+  .priority-low { background: rgba(107, 114, 128, 0.2); color: var(--todo); }
+
+  .tag-chip {
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--accent);
+  }
+
+  .task-card .comment-count {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  /* ── Task Modal ─────────────────────────────── */
+  .task-modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+  }
+
+  .task-modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 90%; max-width: 640px; max-height: 80vh;
+    display: flex; flex-direction: column;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .task-modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .task-modal-header h3 {
+    font-size: 15px; font-weight: 600;
+    line-height: 1.3;
+    flex: 1; margin-right: 12px;
+  }
+
+  .modal-close-btn {
+    background: none; border: none; color: var(--text-dim);
+    font-size: 22px; cursor: pointer; padding: 0 4px;
+    line-height: 1; transition: color 0.15s;
+  }
+  .modal-close-btn:hover { color: var(--text); }
+
+  .task-modal-body {
+    padding: 20px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .task-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .meta-item { font-size: 12px; }
+  .meta-item .meta-label { color: var(--text-dim); margin-bottom: 2px; }
+  .meta-item .meta-value { font-weight: 500; }
+  .meta-item .meta-value.mono { font-family: monospace; font-size: 11px; }
+
+  .status-dot {
+    display: inline-block; width: 8px; height: 8px;
+    border-radius: 50%; margin-right: 4px; vertical-align: middle;
+  }
+
+  .modal-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+
+  .modal-section-title {
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    color: var(--text-dim); letter-spacing: 0.5px;
+    margin-bottom: 8px; padding-bottom: 4px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .task-description {
+    font-size: 13px; line-height: 1.6;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+  .task-description p { margin-bottom: 8px; }
+  .task-description h1, .task-description h2, .task-description h3 { margin: 12px 0 6px; }
+  .task-description ul { padding-left: 20px; margin-bottom: 8px; }
+  .task-description li { margin-bottom: 4px; }
+
+  .task-comments { display: flex; flex-direction: column; gap: 12px; }
+
+  .comment-item {
+    padding: 10px 12px;
+    background: var(--surface2);
+    border-radius: 6px;
+    border-left: 3px solid var(--todo);
+    font-size: 13px;
+  }
+  .comment-item.author-dev { border-left-color: var(--in-progress); }
+  .comment-item.author-qa { border-left-color: var(--testing); }
+  .comment-item.author-pm { border-left-color: var(--review); }
+  .comment-item.author-knowledge { border-left-color: var(--done); }
+  .comment-item.author-system { border-left-color: var(--todo); }
+
+  .comment-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 6px; font-size: 12px;
+  }
+
+  .comment-author-badge {
+    padding: 1px 6px; border-radius: 3px;
+    font-size: 10px; font-weight: 600; text-transform: uppercase;
+    color: white;
+  }
+  .comment-author-badge.badge-dev { background: var(--in-progress); }
+  .comment-author-badge.badge-qa { background: var(--testing); }
+  .comment-author-badge.badge-pm { background: var(--review); }
+  .comment-author-badge.badge-knowledge { background: var(--done); }
+  .comment-author-badge.badge-system { background: var(--todo); }
+  .comment-author-badge.badge-unknown { background: var(--todo); }
+
+  .comment-time { color: var(--text-dim); font-size: 11px; }
+
+  .comment-text { line-height: 1.5; color: var(--text); }
+  .comment-text p { margin-bottom: 6px; }
+
+  .no-comments { color: var(--text-dim); font-size: 12px; font-style: italic; }
+
+  /* ── Knowledge Base ───────────────────────── */
+  .docs-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 16px;
+    min-height: 400px;
+  }
+
+  .docs-list {
+    background: var(--surface);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    overflow-y: auto;
+  }
+
+  .doc-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .doc-item:hover { background: var(--surface2); }
+  .doc-item.active { background: var(--surface2); border-left: 3px solid var(--accent); }
+
+  .doc-item .doc-title {
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+
+  .doc-item .doc-meta {
+    font-size: 11px;
+    color: var(--text-dim);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .category-badge {
+    padding: 1px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .cat-architecture { background: rgba(99, 102, 241, 0.15); color: var(--accent); }
+  .cat-standards { background: rgba(34, 197, 94, 0.15); color: var(--done); }
+  .cat-rules { background: rgba(245, 158, 11, 0.15); color: var(--review); }
+  .cat-decisions { background: rgba(168, 85, 247, 0.15); color: var(--testing); }
+
+  .doc-content {
+    background: var(--surface);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .doc-content h1 { font-size: 20px; margin-bottom: 16px; }
+  .doc-content h2 { font-size: 16px; margin: 20px 0 8px; color: var(--accent); }
+  .doc-content ul, .doc-content ol { padding-left: 20px; margin: 8px 0; }
+  .doc-content li { margin: 4px 0; }
+  .doc-content p { margin: 8px 0; }
+
+  .doc-content .empty {
+    color: var(--text-dim);
+    text-align: center;
+    padding: 60px 20px;
+    font-size: 14px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+  }
+
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+
+  .refresh-indicator {
+    font-size: 11px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .spinner {
+    width: 12px;
+    height: 12px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .hidden { display: none !important; }
+
+  .mono { font-family: 'SF Mono', Monaco, Consolas, monospace; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>&#x1F6E0;&#xFE0F; AI Dev Team <span style="font-size:11px;color:var(--text-dim);font-weight:400">v3.1</span></h1>
+  <div class="stats" id="stats">
+    <div class="refresh-indicator" id="loading"><div class="spinner"></div> Loading...</div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="tasks">&#x1F4CB; Tasks</div>
+  <div class="tab" data-tab="docs">&#x1F4DA; Knowledge Base</div>
+</div>
+
+<div class="content">
+  <!-- Tasks Tab -->
+  <div id="tab-tasks" class="tab-content">
+    <div class="kanban" id="kanban"></div>
+    <div id="task-modal-overlay" class="task-modal-overlay" style="display:none" onclick="closeTaskModal()">
+      <div class="task-modal" onclick="event.stopPropagation()">
+        <div class="task-modal-header">
+          <h3 id="modal-task-title"></h3>
+          <button class="modal-close-btn" onclick="closeTaskModal()">&times;</button>
+        </div>
+        <div class="task-modal-body" id="modal-task-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Docs Tab -->
+  <div id="tab-docs" class="tab-content hidden">
+    <div class="docs-grid">
+      <div class="docs-list" id="docs-list"></div>
+      <div class="doc-content" id="doc-content">
+        <div class="empty">Select a document to view its content</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  // ── State ──────────────────────────────────
+  let tasks = [];
+  let docs = [];
+  let selectedDocId = null;
+  let activeTab = "tasks";
+
+  // ── MCP Communication (matches PB / adas-plugin-sdk protocol) ──────
+  const pendingCalls = new Map();
+  let reqCounter = 0;
+  let hostReady = false;
+
+  window.addEventListener("message", (ev) => {
+    const d = ev.data || {};
+    if (d.source !== "adas-host") return;
+    const msg = d.message;
+
+    // Init handshake — host tells us we're live
+    if (msg?.type === "init") {
+      hostReady = true;
+      console.log("[Dashboard] init received:", msg.payload);
+      loadData();
+      return;
+    }
+
+    // MCP result
+    if (msg?.type === "mcp-result" && msg.payload?.requestId) {
+      const p = pendingCalls.get(msg.payload.requestId);
+      if (p) {
+        pendingCalls.delete(msg.payload.requestId);
+        if (msg.payload.error) p.reject(new Error(msg.payload.error));
+        else p.resolve(msg.payload.result);
+      }
+    }
+  });
+
+  function unwrapResult(raw) {
+    if (raw?.content?.[0]?.type === "text") {
+      try { raw = JSON.parse(raw.content[0].text); } catch {}
+    }
+    // Second pass for double-wrapped responses
+    if (raw?.content?.[0]?.type === "text") {
+      try { raw = JSON.parse(raw.content[0].text); } catch {}
+    }
+    return raw;
+  }
+
+  function mcpCall(tool, args = {}, connectorId = "devteam-dashboard-mcp") {
+    const requestId = "req_" + (++reqCounter) + "_" + Date.now();
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        pendingCalls.delete(requestId);
+        reject(new Error("MCP call timed out"));
+      }, 15000);
+
+      pendingCalls.set(requestId, {
+        resolve: (result) => { clearTimeout(timeout); resolve(unwrapResult(result)); },
+        reject: (err) => { clearTimeout(timeout); reject(err); },
+      });
+
+      window.parent.postMessage({
+        source: "adas-plugin",
+        message: {
+          action: "mcp-call",
+          payload: {
+            requestId,
+            toolName: "cp.fe_api",
+            args: { method: "mcpProxy", params: { connectorId, tool, args } },
+          },
+        },
+      }, "*");
+    });
+  }
+
+  // ── Load data ──────────────────────────────
+  async function loadData() {
+    showLoading(true);
+    try {
+      const [tasksRes, docsRes] = await Promise.all([
+        mcpCall("tasks.list", {}, "task-board-mcp"),
+        mcpCall("knowledge.list_docs", {}, "project-knowledge-mcp"),
+      ]);
+      tasks = tasksRes?.tasks || [];
+      docs = docsRes?.docs || [];
+    } catch {
+      try {
+        tasks = [];
+        docs = [];
+      } catch { /* stay empty */ }
+    }
+    showLoading(false);
+    renderAll();
+  }
+
+
+  // ── Rendering ──────────────────────────────
+  function showLoading(show) {
+    const el = document.getElementById("loading");
+    if (el) el.style.display = show ? "flex" : "none";
+  }
+
+  function renderStats() {
+    const stats = document.getElementById("stats");
+    const activeCount = tasks.filter(t => ["in_progress", "review", "testing"].includes(t.status)).length;
+    const doneCount = tasks.filter(t => t.status === "done").length;
+
+    stats.innerHTML = `
+      <div class="stat-badge"><span class="count">${tasks.length}</span> tasks</div>
+      <div class="stat-badge"><span class="count">${activeCount}</span> active</div>
+      <div class="stat-badge"><span class="count">${doneCount}</span> done</div>
+      <div class="stat-badge"><span class="count">${docs.length}</span> docs</div>
+      <div class="refresh-indicator" id="loading" style="display:none"><div class="spinner"></div></div>
+    `;
+  }
+
+  function renderKanban() {
+    const statuses = ["todo", "in_progress", "review", "testing", "done"];
+    const labels = { todo: "To Do", in_progress: "In Progress", review: "Review", testing: "Testing", done: "Done" };
+    const kanban = document.getElementById("kanban");
+    kanban.innerHTML = statuses.map(status => {
+      const colTasks = tasks.filter(t => t.status === status);
+      return `
+        <div class="kanban-col col-${status}">
+          <div class="kanban-col-header">
+            <span><span class="dot"></span>${labels[status]}</span>
+            <span class="col-count">${colTasks.length}</span>
+          </div>
+          <div class="kanban-cards">
+            ${colTasks.length === 0 ? '<div style="color:var(--text-dim);font-size:12px;text-align:center;padding:20px;">No tasks</div>' : ""}
+            ${colTasks.map(t => `
+              <div class="task-card" data-task-id="${esc(t.id)}">
+                <div class="task-title">${esc(t.title)}</div>
+                <div class="task-meta">
+                  <span class="priority-badge priority-${t.priority}">${t.priority}</span>
+                  ${(t.tags || []).slice(0, 2).map(tag => `<span class="tag-chip">${esc(tag)}</span>`).join("")}
+                  ${(t.comment_count || (t.comments || []).length) > 0 ? `<span class="comment-count">&#x1F4AC; ${t.comment_count || t.comments.length}</span>` : ""}
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }).join("");
+
+    kanban.querySelectorAll(".task-card").forEach(el => {
+      el.addEventListener("click", () => openTaskModal(el.dataset.taskId));
+    });
+  }
+
+  function renderDocs() {
+    const list = document.getElementById("docs-list");
+    if (docs.length === 0) {
+      list.innerHTML = '<div class="empty-state"><div class="icon">&#x1F4DA;</div>No documents yet</div>';
+      return;
+    }
+    list.innerHTML = docs.map(d => `
+      <div class="doc-item ${d.id === selectedDocId ? 'active' : ''}" data-doc-id="${esc(d.id)}">
+        <div class="doc-title">${esc(d.title)}</div>
+        <div class="doc-meta">
+          <span class="category-badge cat-${d.category}">${d.category}</span>
+          ${(d.tags || []).slice(0, 3).map(t => `<span class="tag-chip">${esc(t)}</span>`).join("")}
+        </div>
+      </div>
+    `).join("");
+    list.querySelectorAll(".doc-item").forEach(el => {
+      el.addEventListener("click", () => {
+        selectedDocId = el.dataset.docId;
+        renderDocs();
+        loadDocContent(selectedDocId);
+      });
+    });
+  }
+
+  async function loadDocContent(docId) {
+    const container = document.getElementById("doc-content");
+    container.innerHTML = '<div class="empty"><div class="spinner" style="margin:0 auto 8px"></div>Loading...</div>';
+    try {
+      const doc = await mcpCall("knowledge.get_doc", { id: docId }, "project-knowledge-mcp");
+      if (doc && doc.content) {
+        container.innerHTML = renderMarkdown(doc.content);
+      } else {
+        container.innerHTML = '<div class="empty">Document not found</div>';
+      }
+    } catch {
+      container.innerHTML = '<div class="empty">Failed to load document</div>';
+    }
+  }
+
+  function renderAll() {
+    renderStats();
+    renderKanban();
+    renderDocs();
+  }
+
+  // ── Simple Markdown to HTML ─────────────────
+  function renderMarkdown(md) {
+    return md
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+      .replace(/^### (.+)$/gm, "<h3>$1</h3>")
+      .replace(/^## (.+)$/gm, "<h2>$1</h2>")
+      .replace(/^# (.+)$/gm, "<h1>$1</h1>")
+      .replace(/^\- (.+)$/gm, "<li>$1</li>")
+      .replace(/(<li>.*<\/li>)/gs, "<ul>$1</ul>")
+      .replace(/<\/ul>\s*<ul>/g, "")
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*(.+?)\*/g, "<em>$1</em>")
+      .replace(/`(.+?)`/g, "<code style='background:var(--surface2);padding:1px 4px;border-radius:3px;font-size:12px'>$1</code>")
+      .replace(/\n\n/g, "</p><p>")
+      .replace(/^(?!<[hulo])/gm, "");
+  }
+
+  function esc(s) {
+    if (!s) return "";
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  // ── Task Modal ─────────────────────────────
+  function timeAgo(iso) {
+    if (!iso) return "";
+    const diff = Date.now() - new Date(iso).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1) return "just now";
+    if (mins < 60) return mins + "m ago";
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return hrs + "h ago";
+    const days = Math.floor(hrs / 24);
+    if (days < 30) return days + "d ago";
+    return new Date(iso).toLocaleDateString();
+  }
+
+  function authorBadgeClass(author) {
+    const a = (author || "unknown").toLowerCase();
+    if (a.includes("dev")) return "badge-dev";
+    if (a === "qa") return "badge-qa";
+    if (a === "pm") return "badge-pm";
+    if (a.includes("knowledge")) return "badge-knowledge";
+    if (a === "system") return "badge-system";
+    return "badge-unknown";
+  }
+
+  function authorItemClass(author) {
+    const a = (author || "unknown").toLowerCase();
+    if (a.includes("dev")) return "author-dev";
+    if (a === "qa") return "author-qa";
+    if (a === "pm") return "author-pm";
+    if (a.includes("knowledge")) return "author-knowledge";
+    if (a === "system") return "author-system";
+    return "";
+  }
+
+  function statusLabel(s) {
+    return { todo: "To Do", in_progress: "In Progress", review: "Review", testing: "Testing", done: "Done" }[s] || s;
+  }
+
+  function statusColor(s) {
+    return { todo: "var(--todo)", in_progress: "var(--in-progress)", review: "var(--review)", testing: "var(--testing)", done: "var(--done)" }[s] || "var(--todo)";
+  }
+
+  async function openTaskModal(taskId) {
+    const summary = tasks.find(x => x.id === taskId);
+    if (!summary) return;
+
+    document.getElementById("modal-task-title").textContent = summary.title;
+    document.getElementById("modal-task-body").innerHTML = '<div class="empty"><div class="spinner" style="margin:0 auto 8px"></div>Loading...</div>';
+    document.getElementById("task-modal-overlay").style.display = "flex";
+
+    let t = summary;
+    try {
+      t = await mcpCall("tasks.get", { id: taskId }, "task-board-mcp");
+    } catch { /* fall back to summary data */ }
+
+    const comments = t.comments || [];
+    const desc = t.description || "";
+
+    const body = `
+      <div class="task-meta-grid">
+        <div class="meta-item"><div class="meta-label">ID</div><div class="meta-value mono">${esc(t.id)}</div></div>
+        <div class="meta-item"><div class="meta-label">Status</div><div class="meta-value"><span class="status-dot" style="background:${statusColor(t.status)}"></span>${statusLabel(t.status)}</div></div>
+        <div class="meta-item"><div class="meta-label">Priority</div><div class="meta-value"><span class="priority-badge priority-${t.priority}">${t.priority}</span></div></div>
+        <div class="meta-item"><div class="meta-label">Assignee</div><div class="meta-value">${esc(t.assignee || "unassigned")}</div></div>
+        <div class="meta-item"><div class="meta-label">Created</div><div class="meta-value">${timeAgo(t.created_at)}</div></div>
+        <div class="meta-item"><div class="meta-label">Updated</div><div class="meta-value">${timeAgo(t.updated_at)}</div></div>
+      </div>
+
+      ${(t.tags || []).length > 0 ? `<div class="modal-tags">${t.tags.map(tag => `<span class="tag-chip">${esc(tag)}</span>`).join("")}</div>` : ""}
+
+      ${desc ? `
+        <div class="modal-section-title">Description</div>
+        <div class="task-description">${renderMarkdown(desc)}</div>
+      ` : ""}
+
+      <div class="modal-section-title">Comments (${comments.length})</div>
+      ${comments.length === 0
+        ? '<div class="no-comments">No comments yet</div>'
+        : `<div class="task-comments">${comments.map(c => `
+            <div class="comment-item ${authorItemClass(c.author)}">
+              <div class="comment-header">
+                <span class="comment-author-badge ${authorBadgeClass(c.author)}">${esc(c.author || "unknown")}</span>
+                <span class="comment-time">${timeAgo(c.created_at)}</span>
+              </div>
+              <div class="comment-text">${renderMarkdown(c.text || "")}</div>
+            </div>
+          `).join("")}</div>`
+      }
+    `;
+
+    document.getElementById("modal-task-body").innerHTML = body;
+  }
+
+  window.closeTaskModal = function() {
+    document.getElementById("task-modal-overlay").style.display = "none";
+  };
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeTaskModal();
+  });
+
+  // ── Tab Switching ──────────────────────────
+  document.querySelectorAll(".tab").forEach(tab => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".tab-content").forEach(c => c.classList.add("hidden"));
+      tab.classList.add("active");
+      const tabName = tab.dataset.tab;
+      document.getElementById("tab-" + tabName).classList.remove("hidden");
+      activeTab = tabName;
+    });
+  });
+
+  // ── Init ───────────────────────────────────
+  // Data loading is triggered by the "init" message from PluginHost.
+  // Fallback: if no init arrives within 3s, try loading anyway (local dev).
+  setTimeout(() => { if (!hostReady) { hostReady = true; loadData(); } }, 3000);
+
+  // Auto-refresh data every 30s
+  setInterval(() => { if (hostReady) loadData(); }, 30000);
+})();
+</script>
+</body>
+</html>
