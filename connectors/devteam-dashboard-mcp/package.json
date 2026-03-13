@@ -1,10 +1,16 @@
 {
   "name": "devteam-dashboard-mcp",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "type": "module",
   "main": "server.js",
   "description": "UI dashboard connector for AI Dev Team — kanban board, knowledge base browser, activity feed",
+  "scripts": {
+    "build": "node esbuild.config.mjs"
+  },
   "dependencies": {
     "better-sqlite3": "^12.6.2"
+  },
+  "devDependencies": {
+    "esbuild": "^0.20.0"
   }
 }
