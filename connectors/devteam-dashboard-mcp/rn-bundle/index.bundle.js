@@ -25,6 +25,26 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
+var __async = (__this, __arguments, generator) => {
+  return new Promise((resolve, reject) => {
+    var fulfilled = (value) => {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var rejected = (value) => {
+      try {
+        step(generator.throw(value));
+      } catch (e) {
+        reject(e);
+      }
+    };
+    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+    step((generator = generator.apply(__this, __arguments)).next());
+  });
+};
 
 // rn-src/index.tsx
 var rn_src_exports = {};
@@ -32,7 +52,7 @@ __export(rn_src_exports, {
   default: () => rn_src_default
 });
 module.exports = __toCommonJS(rn_src_exports);
-var import_react = __toESM(require("react"), 1);
+var import_react = require("react");
 var import_react_native = require("react-native");
 var import_plugin_sdk = require("@adas/plugin-sdk");
 var STATUS_ORDER = ["todo", "in_progress", "review", "testing", "done"];
@@ -89,21 +109,22 @@ var rn_src_default = import_plugin_sdk.PluginSDK.register("devteam-dashboard", {
     const [detailLoading, setDetailLoading] = (0, import_react.useState)(false);
     const apiRef = (0, import_react.useRef)(api);
     apiRef.current = api;
-    const fetchData = (0, import_react.useCallback)(async (isRefresh = false) => {
+    const fetchData = (0, import_react.useCallback)((isRefresh = false) => __async(this, null, function* () {
+      var _a, _b;
       try {
         if (!isRefresh) {
           setLoading(true);
           setError(null);
         }
-        const [taskRes, docRes] = await Promise.allSettled([
+        const [taskRes, docRes] = yield Promise.allSettled([
           apiRef.current("task-board-mcp", "tasks.list", {}),
           apiRef.current("project-knowledge-mcp", "knowledge.list_docs", {})
         ]);
         if (taskRes.status === "fulfilled") {
-          setTasks(taskRes.value?.tasks || []);
+          setTasks(((_a = taskRes.value) == null ? void 0 : _a.tasks) || []);
         }
         if (docRes.status === "fulfilled") {
-          setDocs(docRes.value?.docs || []);
+          setDocs(((_b = docRes.value) == null ? void 0 : _b.docs) || []);
         }
         if (!isRefresh && taskRes.status === "rejected" && docRes.status === "rejected") {
           setError("Failed to load data. Check connectivity.");
@@ -116,7 +137,7 @@ var rn_src_default = import_plugin_sdk.PluginSDK.register("devteam-dashboard", {
           setLoading(false);
         setRefreshing(false);
       }
-    }, []);
+    }), []);
     (0, import_react.useEffect)(() => {
       fetchData();
     }, [fetchData]);
@@ -124,38 +145,38 @@ var rn_src_default = import_plugin_sdk.PluginSDK.register("devteam-dashboard", {
       const interval = setInterval(() => fetchData(true), 3e4);
       return () => clearInterval(interval);
     }, [fetchData]);
-    const openTask = (0, import_react.useCallback)(async (taskId) => {
+    const openTask = (0, import_react.useCallback)((taskId) => __async(this, null, function* () {
       try {
         native.haptics.impact("light");
-      } catch {
+      } catch (e) {
       }
       setDetailLoading(true);
       try {
-        const full = await api("task-board-mcp", "tasks.get", { id: taskId });
+        const full = yield api("task-board-mcp", "tasks.get", { id: taskId });
         setSelectedTask(full);
-      } catch {
+      } catch (e) {
         const t = tasks.find((t2) => t2.id === taskId);
         if (t)
           setSelectedTask(t);
       }
       setDetailLoading(false);
-    }, [api, native, tasks]);
-    const openDoc = (0, import_react.useCallback)(async (docId) => {
+    }), [api, native, tasks]);
+    const openDoc = (0, import_react.useCallback)((docId) => __async(this, null, function* () {
       try {
         native.haptics.impact("light");
-      } catch {
+      } catch (e) {
       }
       setDetailLoading(true);
       try {
-        const full = await api("project-knowledge-mcp", "knowledge.get_doc", { id: docId });
+        const full = yield api("project-knowledge-mcp", "knowledge.get_doc", { id: docId });
         setSelectedDoc(full);
-      } catch {
+      } catch (e) {
         const d = docs.find((d2) => d2.id === docId);
         if (d)
           setSelectedDoc(d);
       }
       setDetailLoading(false);
-    }, [api, native, docs]);
+    }), [api, native, docs]);
     if (loading) {
       return /* @__PURE__ */ import_react.default.createElement(import_react_native.View, { style: [s.center, { backgroundColor: theme.colors.bg }] }, /* @__PURE__ */ import_react.default.createElement(import_react_native.ActivityIndicator, { size: "small", color: theme.colors.accent }), /* @__PURE__ */ import_react.default.createElement(import_react_native.Text, { style: { color: theme.colors.textSecondary, marginTop: 8, fontSize: 14 } }, "Loading dashboard..."));
     }
@@ -179,7 +200,7 @@ var rn_src_default = import_plugin_sdk.PluginSDK.register("devteam-dashboard", {
           setTab(t);
           try {
             native.haptics.selection();
-          } catch {
+          } catch (e) {
           }
         }
       },
