@@ -93,7 +93,7 @@ const PLUGIN_MANIFEST = {
   render: {
     mode: "adaptive",
     iframe: {
-      iframeUrl: `/ui/${PLUGIN_ID}/${PLUGIN_VERSION}/index.html`,
+      iframeUrl: `/ui/${PLUGIN_ID}/index.html`,
     },
     reactNative: {
       component: "devteam-dashboard",
